@@ -43,6 +43,8 @@ def load_model():
         st.error(f"モデル '{MODEL_NAME}' の読み込みに失敗しました: {e}")
         st.error("GPUメモリ不足の可能性があります。不要なプロセスを終了するか、より小さいモデルの使用を検討してください。")
         return None
+
+navi_sidebar = st.sidebar.container()
 pipe = llm.load_model()
 
 # --- Streamlit アプリケーション ---
@@ -51,18 +53,20 @@ st.write("Gemmaモデルを使用したチャットボットです。回答に�
 st.markdown("---")
 
 # --- サイドバー ---
-st.sidebar.title("ナビゲーション")
+navi_sidebar.title("ナビゲーション")
 # セッション状態を使用して選択ページを保持
 if 'page' not in st.session_state:
     st.session_state.page = "チャット" # デフォルトページ
 
-page = st.sidebar.radio(
+page = navi_sidebar.radio(
     "ページ選択",
     ["チャット", "履歴閲覧", "サンプルデータ管理"],
     key="page_selector",
     index=["チャット", "履歴閲覧", "サンプルデータ管理"].index(st.session_state.page), # 現在のページを選択状態にする
     on_change=lambda: setattr(st.session_state, 'page', st.session_state.page_selector) # 選択変更時に状態を更新
 )
+navi_sidebar.write('---')
+
 
 
 # --- メインコンテンツ ---

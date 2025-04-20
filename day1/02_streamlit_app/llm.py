@@ -17,29 +17,30 @@ def load_model():
         hf_token = st.secrets["huggingface"]["token"]
         
         device = "cuda" if torch.cuda.is_available() else "cpu"
-        st.info(f"Using device: {device}") # 使用デバイスを表示
+        st.sidebar.info(f"Using device: {device}") # 使用デバイスを表示
         pipe = pipeline(
             "text-generation",
             model=MODEL_NAME,
             model_kwargs={"torch_dtype": torch.bfloat16},
             device=device
         )
-        st.success(f"モデル '{MODEL_NAME}' の読み込みに成功しました。")
+        st.sidebar.success(f"モデル '{MODEL_NAME}' の読み込みに成功しました。")
         return pipe
     except Exception as e:
         st.error(f"モデル '{MODEL_NAME}' の読み込みに失敗しました: {e}")
         st.error("GPUメモリ不足の可能性があります。不要なプロセスを終了するか、より小さいモデルの使用を検討してください。")
         return None
 
-def generate_response(pipe, user_question):
+def generate_response(pipe, user_question, bot_roll):
     """LLMを使用して質問に対する回答を生成する"""
     if pipe is None:
         return "モデルがロードされていないため、回答を生成できません。", 0
 
     try:
         start_time = time.time()
+        prompt = f"あなたは優秀な{bot_roll}です。\n{bot_roll}"
         messages = [
-            {"role": "user", "content": user_question},
+            {"role": "user", "content": prompt},
         ]
         # max_new_tokensを調整可能にする（例）
         outputs = pipe(messages, max_new_tokens=512, do_sample=True, temperature=0.7, top_p=0.9)

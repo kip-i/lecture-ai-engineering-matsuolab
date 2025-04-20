@@ -11,7 +11,10 @@ from metrics import get_metrics_descriptions
 def display_chat_page(pipe):
     """チャットページのUIを表示する"""
     st.subheader("質問を入力してください")
+    rolls = ["エンジニア","先生"]
+    bot_roll = st.segmented_control('botのロール',rolls,selection_mode='single')
     user_question = st.text_area("質問", key="question_input", height=100, value=st.session_state.get("current_question", ""))
+
     submit_button = st.button("質問を送信")
 
     # セッション状態の初期化（安全のため）
@@ -31,7 +34,7 @@ def display_chat_page(pipe):
         st.session_state.feedback_given = False # フィードバック状態もリセット
 
         with st.spinner("モデルが回答を生成中..."):
-            answer, response_time = generate_response(pipe, user_question)
+            answer, response_time = generate_response(pipe, user_question, bot_roll)
             st.session_state.current_answer = answer
             st.session_state.response_time = response_time
             # ここでrerunすると回答とフィードバックが一度に表示される
